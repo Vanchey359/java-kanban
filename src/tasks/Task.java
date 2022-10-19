@@ -1,37 +1,15 @@
+package tasks;
+
 public class Task {
 
     private String title;
     private String description;
-    private int id;
+    private Integer id;
     private String status;
-
-    public Task(String title, String description, String status) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
-    }
-
-    public Task(String title, String description, int id, String status) {
-        this.title = title;
-        this.description = description;
-        this.id = id;
-        this.status = status;
-    }
-
-    public Task(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
-    public Task(String title, String description, int id) {
-        this.title = title;
-        this.description = description;
-        this.id = id;
-    }
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "tasks.Task{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
