@@ -1,4 +1,3 @@
-import service.HistoryManager;
 import service.Managers;
 import service.TaskManager;
 import task.Epic;
@@ -12,7 +11,6 @@ public class Main {
     public static void main(String[] args) {
 
         TaskManager taskManager = Managers.getDefault();
-        HistoryManager historyManager = Managers.getDefaultHistory();
 
         Task task1 = new Task();
         task1.setTitle("Task#1");
@@ -80,7 +78,7 @@ public class Main {
         taskManager.getTaskById(1);
         taskManager.getEpicById(3);
         taskManager.getSubtaskById(4);
-        System.out.println(historyManager.getHistory());
+        System.out.println(taskManager.getHistory());
 
 
         System.out.println("");
