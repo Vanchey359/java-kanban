@@ -4,7 +4,9 @@ import task.Epic;
 import task.Subtask;
 import task.Task;
 
-import static task.Status.*;
+import static task.Status.DONE;
+import static task.Status.IN_PROGRESS;
+import static task.Status.NEW;
 
 public class Main {
 
@@ -43,92 +45,54 @@ public class Main {
         subtask2.setEpicId(epicId1);
         final int subtaskId2 = taskManager.createSubtask(subtask2);
 
+        Subtask subtask3 = new Subtask();
+        subtask3.setTitle("Subtask#3-1");
+        subtask3.setDescription("Subtask3-1 description");
+        subtask3.setStatus(DONE);
+        subtask3.setEpicId(epicId1);
+        final int subtaskId3 = taskManager.createSubtask(subtask3);
+
         Epic epic2 = new Epic();
         epic2.setTitle("Epic#2");
         epic2.setDescription("Epic2 description");
         final int epicId2 = taskManager.createEpic(epic2);
 
+        taskManager.getTaskById(taskId1);
 
-        Subtask subtask3 = new Subtask();
-        subtask3.setTitle("Subtask#1-2");
-        subtask3.setDescription("Subtask1-2 description");
-        subtask3.setStatus(DONE);
-        subtask3.setEpicId(epicId2);
-        final int subtaskId3 = taskManager.createSubtask(subtask3);
-        epic2.getSubtaskIds().add(subtaskId3);
+        taskManager.getTaskById(taskId2);
 
-        System.out.println(taskManager.getAllTasks());
-        System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
+        taskManager.getEpicById(epicId1);
 
-        System.out.println("");
-        System.out.println("Проверка истории просмотра задач");
-        System.out.println("");
+        taskManager.getSubtaskById(subtaskId1);
+        taskManager.getSubtaskById(subtaskId2);
+        taskManager.getSubtaskById(subtaskId3);
 
-        //Создал 10 задач, 11 - эпик, 12 - сабтаск. При корректной работе должно выдавать всего 10 элементов истории, конечными будут являться эпик и сабтаск.
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(1);
-        taskManager.getEpicById(3);
-        taskManager.getSubtaskById(4);
+        taskManager.getEpicById(epicId2);
         System.out.println(taskManager.getHistory());
 
-
-        System.out.println("");
-        System.out.println("Меняю статусы созданных объектов");
         System.out.println("");
 
-        Task taskOneUpdate = new Task();
-        taskOneUpdate.setTitle("Task#1");
-        taskOneUpdate.setDescription("Task1 update description ИЗМЕНИЛ СТАТУС НА DONE - БЫЛ NEW");
-        taskOneUpdate.setId(task1.getId());
-        taskOneUpdate.setStatus(DONE);
-        final int updateTaskId1 = taskManager.updateTask(taskOneUpdate);
-
-        Epic updateEpic2 = new Epic();
-        updateEpic2.setTitle("Epic#2");
-        updateEpic2.setDescription("Epic2 update description СТАТУС БЫЛ DONE - ДОЛЖЕН СТАТЬ NEW");
-        updateEpic2.setId(epic2.getId());
-        final int updateEpicId2 = taskManager.updateEpic(updateEpic2);
-
-        Subtask subtaskThreeUpdate = new Subtask();
-        subtaskThreeUpdate.setTitle("Subtask#1-2");
-        subtaskThreeUpdate.setDescription("Subtask1-2 update description");
-        subtaskThreeUpdate.setId(subtask3.getId());
-        subtaskThreeUpdate.setStatus(NEW);
-        subtaskThreeUpdate.setEpicId(updateEpicId2);
-        final int updateSubtaskId3 = taskManager.updateSubtask(subtaskThreeUpdate);
-
-        System.out.println(taskManager.getAllTasks());
-        System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
+        taskManager.getTaskById(taskId1); // Повторный запрос - Таск 1 должна удалиться из начала списка и встать в конец.
+        System.out.println(taskManager.getHistory());
 
         System.out.println("");
-        System.out.println("Удаляю задачу 2 и обновленный эпик 2 (его подзадачи удаляются вместе с ним)");
-        System.out.println("");
 
-        taskManager.removeTaskById(task2.getId());
-        taskManager.removeEpicById(updateEpic2.getId());
-
-        System.out.println(taskManager.getAllTasks());
-        System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
+        taskManager.getSubtaskById(subtaskId1); // Повторный запрос - Сабтаск 1 должен удалиться с 3 позиции в списке и встать в конец.
+        System.out.println(taskManager.getHistory());
 
         System.out.println("");
-        System.out.println("Удаляю все сабтаски - Эпик 1 должен получить статус NEW");
+
+        taskManager.getEpicById(epicId1); // Повторный запрос - Эпик 1 должен удалиться с 2 позиции в списке и встать в конец.
+        System.out.println(taskManager.getHistory());
+
         System.out.println("");
 
-        taskManager.removeAllSubtasks();
+        taskManager.removeTaskById(taskId2); // Удаляю Таск 2 - находился на 1 позиции в списке.
+        System.out.println(taskManager.getHistory());
 
-        System.out.println(taskManager.getAllTasks());
-        System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
+        System.out.println("");
+
+        taskManager.removeEpicById(epicId1); // Удаляю Эпик 1, с ним должны удалиться все его Сабтаски.
+        System.out.println(taskManager.getHistory());
     }
 }

@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static task.Status.*;
+import static task.Status.DONE;
+import static task.Status.IN_PROGRESS;
+import static task.Status.NEW;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -21,10 +23,6 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
 
-
-    private void nextId() {
-        currentId++;
-    }
 
     @Override
     public List<Task> getAllTasks() {
@@ -129,15 +127,18 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTaskById(int taskId) {
         tasks.remove(taskId);
+        historyManager.remove(taskId);
     }
 
     @Override
     public void removeEpicById(int epicId) {
-        List<Subtask> epicSubtasks = getSubtasksByEpic(epics.get(epicId));
+        List<Subtask> epicSubtasks = getSubtasksByEpic(epicId);
         for (Subtask subtask : epicSubtasks) {
             subtasks.remove(subtask.getId());
+            historyManager.remove(subtask.getId());
         }
         epics.remove(epicId);
+        historyManager.remove(epicId);
     }
 
     @Override
@@ -146,13 +147,14 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.remove(subtaskId);
         epics.get(epicId).getSubtaskIds().remove(subtaskId);
         calculateEpicStatus(epics.get(epicId));
+        historyManager.remove(subtaskId);
     }
 
     @Override
-    public List<Subtask> getSubtasksByEpic(Epic epic) {
+    public List<Subtask> getSubtasksByEpic(int epicId) {
         List<Subtask> epicSubtasks = new ArrayList<>();
         for (Subtask subtask : subtasks.values()) {
-            if (subtask.getEpicId() == epic.getId()) {
+            if (subtask.getEpicId() == epicId) {
                 epicSubtasks.add(subtask);
             }
         }
@@ -164,6 +166,9 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
+    private void nextId() {
+        currentId++;
+    }
 
     private void calculateEpicStatus(Epic epic) {
         int newCounter = 0;
