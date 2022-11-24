@@ -1,12 +1,9 @@
-import service.Managers;
-import service.TaskManager;
-import task.Epic;
-import task.Subtask;
-import task.Task;
-
-import static task.Status.DONE;
-import static task.Status.IN_PROGRESS;
-import static task.Status.NEW;
+import ru.yandex.practicum.tasktracker.service.Managers;
+import ru.yandex.practicum.tasktracker.service.TaskManager;
+import ru.yandex.practicum.tasktracker.task.Epic;
+import ru.yandex.practicum.tasktracker.task.Status;
+import ru.yandex.practicum.tasktracker.task.Subtask;
+import ru.yandex.practicum.tasktracker.task.Task;
 
 public class Main {
 
@@ -17,13 +14,13 @@ public class Main {
         Task task1 = new Task();
         task1.setTitle("Task#1");
         task1.setDescription("Task1 description");
-        task1.setStatus(NEW);
+        task1.setStatus(Status.NEW);
         final int taskId1 = taskManager.createTask(task1);
 
         Task task2 = new Task();
         task2.setTitle("Task#2");
         task2.setDescription("Task2 description");
-        task2.setStatus(IN_PROGRESS);
+        task2.setStatus(Status.IN_PROGRESS);
         final int taskId2 = taskManager.createTask(task2);
 
         Epic epic1 = new Epic();
@@ -34,21 +31,21 @@ public class Main {
         Subtask subtask1 = new Subtask();
         subtask1.setTitle("Subtask#1-1");
         subtask1.setDescription("Subtask1-1 description");
-        subtask1.setStatus(NEW);
+        subtask1.setStatus(Status.NEW);
         subtask1.setEpicId(epicId1);
         final int subtaskId1 = taskManager.createSubtask(subtask1);
 
         Subtask subtask2 = new Subtask();
         subtask2.setTitle("Subtask#2-1");
         subtask2.setDescription("Subtask2-1 description");
-        subtask2.setStatus(IN_PROGRESS);
+        subtask2.setStatus(Status.IN_PROGRESS);
         subtask2.setEpicId(epicId1);
         final int subtaskId2 = taskManager.createSubtask(subtask2);
 
         Subtask subtask3 = new Subtask();
         subtask3.setTitle("Subtask#3-1");
         subtask3.setDescription("Subtask3-1 description");
-        subtask3.setStatus(DONE);
+        subtask3.setStatus(Status.DONE);
         subtask3.setEpicId(epicId1);
         final int subtaskId3 = taskManager.createSubtask(subtask3);
 

@@ -1,4 +1,4 @@
-package service;
+package ru.yandex.practicum.tasktracker.service;
 
 public class Managers {
 

@@ -1,8 +1,8 @@
-package service;
+package ru.yandex.practicum.tasktracker.service;
 
-import task.Epic;
-import task.Subtask;
-import task.Task;
+import ru.yandex.practicum.tasktracker.task.Epic;
+import ru.yandex.practicum.tasktracker.task.Subtask;
+import ru.yandex.practicum.tasktracker.task.Task;
 
 import java.util.List;
 

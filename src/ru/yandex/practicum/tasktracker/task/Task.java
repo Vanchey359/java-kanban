@@ -1,4 +1,4 @@
-package task;
+package ru.yandex.practicum.tasktracker.task;
 
 public class Task {
 
@@ -47,5 +47,27 @@ public class Task {
                 ", id=" + id +
                 ", status='" + status + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Task task = (Task) o;
+
+        if (!title.equals(task.title)) return false;
+        if (!description.equals(task.description)) return false;
+        if (!id.equals(task.id)) return false;
+        return status == task.status;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title.hashCode();
+        result = 31 * result + description.hashCode();
+        result = 31 * result + id.hashCode();
+        result = 31 * result + status.hashCode();
+        return result;
     }
 }
