@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasktracker.task;
 
+import java.util.Objects;
+
 public class Task {
 
     private String title;
@@ -51,23 +53,23 @@ public class Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task)) {
+            return false;
+        }
 
         Task task = (Task) o;
 
-        if (!title.equals(task.title)) return false;
-        if (!description.equals(task.description)) return false;
-        if (!id.equals(task.id)) return false;
-        return status == task.status;
+        return Objects.equals(title, task.title)
+                && Objects.equals(description, task.description)
+                && Objects.equals(id, task.id)
+                && status == task.status;
     }
 
     @Override
     public int hashCode() {
-        int result = title.hashCode();
-        result = 31 * result + description.hashCode();
-        result = 31 * result + id.hashCode();
-        result = 31 * result + status.hashCode();
-        return result;
+        return Objects.hash(title, description, id, status);
     }
 }

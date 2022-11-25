@@ -3,6 +3,7 @@ package ru.yandex.practicum.tasktracker.task;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -30,19 +31,20 @@ public class Epic extends Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task)) {
+            return false;
+        }
 
         Epic epic = (Epic) o;
 
-        return subtaskIds.equals(epic.subtaskIds);
+        return Objects.equals(subtaskIds, epic.subtaskIds);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + subtaskIds.hashCode();
-        return result;
+        return Objects.hash(subtaskIds);
     }
 }

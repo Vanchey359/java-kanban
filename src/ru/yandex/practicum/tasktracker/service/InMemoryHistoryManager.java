@@ -58,7 +58,6 @@ public class InMemoryHistoryManager implements HistoryManager{
         final Node oldLast = last;
         final Node newNode = new Node(task);
         newNode.prev = last;
-        newNode.next = null;
         last = newNode;
         if (oldLast == null) {
             first = newNode;
