@@ -8,7 +8,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class InMemoryHistoryManagerTest {
+class InMemoryHistoryManagerTest {
     private final HistoryManager historyManager = new InMemoryHistoryManager();
 
     @Test
@@ -18,9 +18,9 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void add_shouldSaveTaskToHistory() {
-        Task task1 = task(1L);
-        Task task2 = task(2L);
-        Task task3 = task(3L);
+        Task task1 = task(1);
+        Task task2 = task(2);
+        Task task3 = task(3);
 
         historyManager.add(task1);
         historyManager.add(task2);
@@ -34,10 +34,10 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void add_shouldNotKeepDuplicates() {
-        Task task1 = task(1L);
-        Task task2 = task(2L);
-        Task task3 = task(3L);
-        Task task4 = task(1L);
+        Task task1 = task(1);
+        Task task2 = task(2);
+        Task task3 = task(3);
+        Task task4 = task(1);
 
         historyManager.add(task1);
         historyManager.add(task2);
@@ -52,17 +52,27 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void remove_shouldRemoveTaskFromHistory() {
-        Task task1 = task(1L);
-        Task task2 = task(2L);
-        Task task3 = task(3L);
+        Task task1 = task(1);
+        Task task2 = task(2);
+        Task task3 = task(3);
+        Task task4 = task(4);
+        Task task5 = task(5);
+        Task task6 = task(6);
+        Task task7 = task(7);
 
         historyManager.add(task1);
         historyManager.add(task2);
         historyManager.add(task3);
+        historyManager.add(task4);
+        historyManager.add(task5);
+        historyManager.add(task6);
+        historyManager.add(task7);
 
-        historyManager.remove((int) 2L);
+        historyManager.remove(1);
+        historyManager.remove(4);
+        historyManager.remove(7);
 
-        List<Task> expected = List.of(task1, task3);
+        List<Task> expected = List.of(task2, task3, task5, task6);
         List<Task> actual = historyManager.getHistory();
 
         assertEquals(expected, actual);
@@ -70,10 +80,10 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void add_shouldMoveTaskToTheEnd_ifTaskAlreadyExistsInHistory() {
-        Task task1 = task(1L);
-        Task task2 = task(2L);
-        Task task3 = task(3L);
-        Task task4 = task(1L);
+        Task task1 = task(1);
+        Task task2 = task(2);
+        Task task3 = task(3);
+        Task task4 = task(1);
 
         historyManager.add(task1);
         historyManager.add(task2);
@@ -83,12 +93,12 @@ public class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task1);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual); // Идентичен методу выше - получается он не нужен? (Вопрос в том можно ли 1 методом теста закрывать сразу несколько тестируемых случаев или лучше для каждого случая писать отдельный метод как я это сделал тут?)
+        assertEquals(expected, actual);
     }
 
-    private static Task task(long id) {
+    private static Task task(int id) {
         Task task = new Task();
-        task.setId((int) id);
+        task.setId(id);
         return task;
     }
 }
