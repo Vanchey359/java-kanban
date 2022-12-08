@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasktracker.task;
 
+import ru.yandex.practicum.tasktracker.service.TaskType;
+
 import java.util.Objects;
 
 public class Task {
@@ -71,5 +73,10 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(title, description, id, status);
+    }
+
+    public String toCsvRow() {
+        return getId() + "," + TaskType.TASK + "," + getTitle() + "," + getStatus() + "," + getDescription(); // не понял как применить в этом методе String.format - мне же надо передать в него уже готовую строку и прибавлять к ней что-то в конец или в начало
+                                                                                                              //а если я каждую часть сделаю отдельной строкой и через формат буду вставлять в запятые и соединять строку это ведь будет еще хуже выглядеть
     }
 }

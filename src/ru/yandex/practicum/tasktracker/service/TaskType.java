@@ -1,7 +1,7 @@
 package ru.yandex.practicum.tasktracker.service;
 
-public enum TaskTypes {
+public enum TaskType {
     TASK,
     EPIC,
-    SUBTASk
+    SUBTASK
 }

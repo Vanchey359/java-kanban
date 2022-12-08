@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasktracker.task;
 
+import ru.yandex.practicum.tasktracker.service.TaskType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,16 +27,9 @@ public class Epic extends Task {
         subtaskIds.clear();
     }
 
-    public void setSubtaskIds(List<Integer> subtaskIds) {
-        this.subtaskIds = subtaskIds;
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Task)) {
+        if (!(o instanceof Task) || !super.equals(o)) {
             return false;
         }
 
@@ -45,6 +40,11 @@ public class Epic extends Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(subtaskIds);
+        return Objects.hash(super.hashCode(), subtaskIds);
+    }
+
+    @Override
+    public String toCsvRow() {
+        return getId() + "," + TaskType.EPIC + "," + getTitle() + "," + getStatus() + "," + getDescription();
     }
 }

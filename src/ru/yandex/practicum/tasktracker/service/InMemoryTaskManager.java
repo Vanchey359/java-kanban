@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     protected int currentId = 0;
 

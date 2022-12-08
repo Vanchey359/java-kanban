@@ -1,5 +1,7 @@
 package ru.yandex.practicum.tasktracker.task;
 
+import ru.yandex.practicum.tasktracker.service.TaskType;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -16,10 +18,7 @@ public class Subtask extends Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Task)) {
+        if (!(o instanceof Task) || !super.equals(o)) {
             return false;
         }
 
@@ -30,6 +29,11 @@ public class Subtask extends Task {
 
     @Override
     public int hashCode() {
-        return Objects.hash(epicId);
+        return Objects.hash(super.hashCode(), epicId);
+    }
+
+    @Override
+    public String toCsvRow() {
+        return getId() + "," + TaskType.SUBTASK + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getEpicId();
     }
 }
