@@ -224,6 +224,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
 
             FileBackedTaskManager restoredManager = loadFromFile(new File("History.csv"));
+        System.out.println(currentId); // проверка поля генеретора id;
     }
 
 }
