@@ -9,11 +9,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryHistoryManagerTest {
+
     private final HistoryManager historyManager = new InMemoryHistoryManager();
 
     @Test
     void getHistory_shouldReturnEmptyHistory() {
-        assertTrue(historyManager.getHistory().isEmpty());
+        assertTrue(historyManager.getHistory().isEmpty(), "История не пустая!");
+    }
+
+    @Test
+    void getHistory_shouldReturnHistory() {
+        Task task1 = task(1);
+        Task task2 = task(2);
+        Task task3 = task(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        assertEquals(3, historyManager.getHistory().size(), "История не выводится!");
     }
 
     @Test
@@ -29,7 +43,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task1, task2, task3);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual, "История не сохраняется!");
     }
 
     @Test
@@ -47,7 +61,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task1);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual, "История содержит дубликаты!");
     }
 
     @Test
@@ -75,7 +89,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task5, task6);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual, "Задачи не удаляются из истории!");
     }
 
     @Test
@@ -93,7 +107,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task1);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual, "Задача не перемещается в конец истории!");
     }
 
     private static Task task(int id) {

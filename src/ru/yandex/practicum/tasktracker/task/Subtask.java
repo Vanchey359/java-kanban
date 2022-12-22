@@ -34,6 +34,6 @@ public class Subtask extends Task {
 
     @Override
     public String toCsvRow() {
-        return getId() + "," + TaskType.SUBTASK + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getEpicId();
+        return getId() + "," + TaskType.SUBTASK + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getEpicId() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
     }
 }

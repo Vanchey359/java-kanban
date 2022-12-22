@@ -2,14 +2,18 @@ package ru.yandex.practicum.tasktracker.task;
 
 import ru.yandex.practicum.tasktracker.service.TaskType;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task {
+public class Task implements Comparable<Task>{
 
     private String title;
     private String description;
     private Integer id;
     private Status status;
+    private Integer duration;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     public String getTitle() {
         return title;
@@ -41,6 +45,34 @@ public class Task {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        LocalDateTime endTime = null;
+        if (startTime != null && duration != null) {
+             endTime = startTime.plusMinutes(duration);
+        }
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     @Override
@@ -76,7 +108,17 @@ public class Task {
     }
 
     public String toCsvRow() {
-        return getId() + "," + TaskType.TASK + "," + getTitle() + "," + getStatus() + "," + getDescription(); // не понял как применить в этом методе String.format - мне же надо передать в него уже готовую строку и прибавлять к ней что-то в конец или в начало
-                                                                                                              //а если я каждую часть сделаю отдельной строкой и через формат буду вставлять в запятые и соединять строку это ведь будет еще хуже выглядеть
+        return getId() + "," + TaskType.TASK + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
+    }
+
+    @Override
+    public int compareTo(Task o) {
+        int comparator = 1;
+        if (startTime != null && o.startTime != null) {
+           if (getStartTime().isBefore(o.getStartTime())) {
+               comparator = -1;
+           }
+        }
+        return comparator;
     }
 }

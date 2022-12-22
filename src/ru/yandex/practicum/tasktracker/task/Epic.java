@@ -2,6 +2,7 @@ package ru.yandex.practicum.tasktracker.task;
 
 import ru.yandex.practicum.tasktracker.service.TaskType;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.Objects;
 public class Epic extends Task {
 
     private List<Integer> subtaskIds = new ArrayList<>();
+
+    private LocalDateTime endTime;
 
     public List<Integer> getSubtaskIds() {
         return Collections.unmodifiableList(subtaskIds);
@@ -20,11 +23,21 @@ public class Epic extends Task {
     }
 
     public void removeSubtaskId(int subtaskId) {
-        subtaskIds.remove(subtaskId);
+        subtaskIds.remove((Integer) subtaskId); //// Исправил благодаря тестам! Как я понял int не является объектом листа по этому метод воспринимает его как индекс в этом листе. А что бы он искал именно объект subtaskId в листе его надо привести к Integer.
+
     }
 
     public void clearSubtaskIds() {
         subtaskIds.clear();
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     @Override
@@ -45,6 +58,6 @@ public class Epic extends Task {
 
     @Override
     public String toCsvRow() {
-        return getId() + "," + TaskType.EPIC + "," + getTitle() + "," + getStatus() + "," + getDescription();
+        return getId() + "," + TaskType.EPIC + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
     }
 }
