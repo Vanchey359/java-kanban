@@ -5,7 +5,7 @@ import ru.yandex.practicum.tasktracker.service.TaskType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task implements Comparable<Task>{
+public class Task implements Comparable<Task> {
 
     private String title;
     private String description;
@@ -13,7 +13,6 @@ public class Task implements Comparable<Task>{
     private Status status;
     private Integer duration;
     private LocalDateTime startTime;
-    private LocalDateTime endTime;
 
     public String getTitle() {
         return title;
@@ -71,10 +70,6 @@ public class Task implements Comparable<Task>{
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
     @Override
     public String toString() {
         return "tasks.Task{" +
@@ -113,12 +108,16 @@ public class Task implements Comparable<Task>{
 
     @Override
     public int compareTo(Task o) {
-        int comparator = 1;
-        if (startTime != null && o.startTime != null) {
-           if (getStartTime().isBefore(o.getStartTime())) {
-               comparator = -1;
-           }
+
+        if (this.startTime == null) {
+            return 1;
         }
-        return comparator;
+        if (o.getStartTime() == null) {
+            return -1;
+        }
+        if (this.startTime.isAfter(o.getStartTime())) {
+            return 1;
+        }
+        return -1;
     }
 }

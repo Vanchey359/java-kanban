@@ -1,3 +1,5 @@
+package ru.yandex.practicum.tasktracker.service.test;
+
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.tasktracker.service.HistoryManager;
 import ru.yandex.practicum.tasktracker.service.InMemoryHistoryManager;
@@ -14,7 +16,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistory_shouldReturnEmptyHistory() {
-        assertTrue(historyManager.getHistory().isEmpty(), "История не пустая!");
+        assertTrue(historyManager.getHistory().isEmpty(), "History is not empty!");
     }
 
     @Test
@@ -27,7 +29,7 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task2);
         historyManager.add(task3);
 
-        assertEquals(3, historyManager.getHistory().size(), "История не выводится!");
+        assertEquals(3, historyManager.getHistory().size(), "History is not displayed!");
     }
 
     @Test
@@ -43,7 +45,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task1, task2, task3);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual, "История не сохраняется!");
+        assertEquals(expected, actual, "History is not saved!");
     }
 
     @Test
@@ -61,7 +63,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task1);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual, "История содержит дубликаты!");
+        assertEquals(expected, actual, "History contains duplicates!");
     }
 
     @Test
@@ -89,7 +91,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task5, task6);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual, "Задачи не удаляются из истории!");
+        assertEquals(expected, actual, "Tasks are not removed from history!");
     }
 
     @Test
@@ -107,7 +109,7 @@ class InMemoryHistoryManagerTest {
         List<Task> expected = List.of(task2, task3, task1);
         List<Task> actual = historyManager.getHistory();
 
-        assertEquals(expected, actual, "Задача не перемещается в конец истории!");
+        assertEquals(expected, actual, "The task does not move to the end of history!");
     }
 
     private static Task task(int id) {

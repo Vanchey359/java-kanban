@@ -22,9 +22,8 @@ public class Epic extends Task {
         subtaskIds.add(subtaskId);
     }
 
-    public void removeSubtaskId(int subtaskId) {
-        subtaskIds.remove((Integer) subtaskId); //// Исправил благодаря тестам! Как я понял int не является объектом листа по этому метод воспринимает его как индекс в этом листе. А что бы он искал именно объект subtaskId в листе его надо привести к Integer.
-
+    public void removeSubtaskId(Integer subtaskId) {
+        subtaskIds.remove(subtaskId);
     }
 
     public void clearSubtaskIds() {

@@ -7,7 +7,11 @@ import ru.yandex.practicum.tasktracker.task.Task;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -39,7 +43,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllTasks() {
         for (Task task : tasks.values()) {
             if (historyManager.getHistory().contains(task)) {
-                historyManager.remove(task.getId());          //// Выявил ошибку при написании теста. При удалении созданных задач, которые не были добавлены в историю - выскакивал NullPointerException в этом месте. Добавил эту проверку для нормализации работы метода.
+                historyManager.remove(task.getId());
             }
         }
         tasks.clear();
@@ -51,7 +55,7 @@ public class InMemoryTaskManager implements TaskManager {
             List<Subtask> epicSubtasks = getSubtasksByEpic(epic.getId());
             for (Subtask subtask : epicSubtasks) {
                 if (historyManager.getHistory().contains(subtask)) {
-                    historyManager.remove(subtask.getId());            //// То же самое что и сверху.
+                    historyManager.remove(subtask.getId());
                 }
             }
             if (historyManager.getHistory().contains(epic)) {
@@ -66,7 +70,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllSubtasks() {
         for (Subtask subtask : subtasks.values()) {
             if (historyManager.getHistory().contains(subtask)) {
-                historyManager.remove(subtask.getId());            //// То же самое что и сверху.
+                historyManager.remove(subtask.getId());
             }
         }
         subtasks.clear();
@@ -96,9 +100,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int createTask(Task task) {
-        if (task.getStartTime() != null) {
-            chekTimeCrossing(task);
-        }
+        chekTimeCrossing(task);
         nextId();
         task.setId(currentId);
         tasks.put(currentId, task);
@@ -116,9 +118,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int createSubtask(Subtask subtask) {
-        if (subtask.getStartTime() != null) {
-            chekTimeCrossing(subtask);
-        }
+        chekTimeCrossing(subtask);
         nextId();
         subtask.setId(currentId);
         subtasks.put(currentId, subtask);
@@ -132,18 +132,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int updateTask(Task task) {
-        if (task.getStartTime() != null) {
-                chekTimeCrossing(task);
-        }
+        chekTimeCrossing(task);
         tasks.put(task.getId(), task);
         return task.getId();
     }
 
     @Override
     public int updateSubtask(Subtask subtask) {
-        if (subtask.getStartTime() != null) {
-                chekTimeCrossing(subtask);
-        }
+        chekTimeCrossing(subtask);
         subtasks.put(subtask.getId(), subtask);
         calculateEpicStatus(epics.get(subtask.getEpicId()));
         calculateEpicStartTime(epics.get(subtask.getEpicId()));
@@ -161,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(int taskId) {
-        if (historyManager.getHistory().contains(tasks.get(taskId))) {   ////То же самое.
+        if (historyManager.getHistory().contains(tasks.get(taskId))) {
             historyManager.remove(taskId);
         }
         tasks.remove(taskId);
@@ -170,15 +166,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int epicId) {
         List<Subtask> epicSubtasks = getSubtasksByEpic(epicId);
-        if (!epicSubtasks.isEmpty()) {                          //// То же самое.
+        if (!epicSubtasks.isEmpty()) {
             for (Subtask subtask : epicSubtasks) {
                 subtasks.remove(subtask.getId());
-                if (historyManager.getHistory().contains(subtask)) {   //// То же самое.
+                if (historyManager.getHistory().contains(subtask)) {
                     historyManager.remove(subtask.getId());
                 }
             }
         }
-        if (historyManager.getHistory().contains(epics.get(epicId))) {   //// То же самое.
+        if (historyManager.getHistory().contains(epics.get(epicId))) {
             historyManager.remove(epicId);
         }
         epics.remove(epicId);
@@ -188,7 +184,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeSubtaskById(int subtaskId) {
         int epicId = subtasks.get(subtaskId).getEpicId();
         epics.get(epicId).removeSubtaskId(subtaskId);
-        if (historyManager.getHistory().contains(subtasks.get(subtaskId))) { //// То же самое.
+        if (historyManager.getHistory().contains(subtasks.get(subtaskId))) {
             historyManager.remove(subtaskId);
         }
         subtasks.remove(subtaskId);
@@ -245,10 +241,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public TreeSet<Task> getPrioritizedTasks() {
-        TreeSet<Task> prioritizedTasks = new TreeSet<>();
-        prioritizedTasks.addAll(getAllSubtasks());
-        prioritizedTasks.addAll(getAllTasks());
-        return prioritizedTasks;
+        TreeSet<Task> prioritizedTask = new TreeSet<>();
+        prioritizedTask.addAll(getAllTasks());
+        prioritizedTask.addAll(getAllSubtasks());
+        return prioritizedTask;
     }
 
     private void calculateEpicStartTime(Epic epic) {
@@ -292,18 +288,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void chekTimeCrossing(Task task) {
-        TreeSet<Task> prioritizedTasks = getPrioritizedTasks();
-        ArrayList<Task> prioritizedTaskList = new ArrayList<>(prioritizedTasks);
+        if (task.getStartTime() != null) {
+            TreeSet<Task> prioritizedTasks = getPrioritizedTasks();
+            ArrayList<Task> prioritizedTaskList = new ArrayList<>(prioritizedTasks);
             for (Task element : prioritizedTaskList) {
                 if (element.getStartTime() != null && element.getEndTime() != null) {
                     try {
                         if (task.getStartTime().isAfter(element.getStartTime()) && task.getStartTime().isBefore(element.getEndTime())) {
-                            throw new TimeCrossingException("Время выполнения задачи пересекается с уже существующей задачей!");
+                            throw new TimeCrossingException("The execution time of the task overlaps with an already existing task!");
                         }
                     } catch (IllegalArgumentException e) {
                         e.printStackTrace();
                     }
                 }
             }
+        }
     }
 }
