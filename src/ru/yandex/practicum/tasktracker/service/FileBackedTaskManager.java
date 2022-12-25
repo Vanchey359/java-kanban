@@ -11,7 +11,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -39,34 +42,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             for (String line : lines) {
-                String[] splitedLine = line.split(",");   // Тут была большая ошибка. При повышении id до двузначных чисел - логика работы ломалась так как я искал startWith(второй элемент в строке), когда id становился двузначным, второй элемент в строке все еще был id а не тип задачи.
-                if (splitedLine.length > TASK_TYPE_START_FROM) {
-                    String type = splitedLine[TASK_TYPE_START_FROM];
-                    switch (type) {
-                        case "TASK":
-                            Task task = restoredManager.createTaskFromString(line);
-                            if (task.getId() > currentId) {
-                                currentId = task.getId();
-                            }
-                            break;
-                        case "EPIC":
-                            Epic epic = restoredManager.createEpicFromString(line);
-                            if (epic.getId() > currentId) {
-                                currentId = epic.getId();
-                            }
-                            break;
-                        case "SUBTASK":
-                            Subtask subtask = restoredManager.createSubtaskFromString(line);
-                            restoredManager.epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
-                            if (subtask.getId() > currentId) {
-                                currentId = subtask.getId();
-                            }
-                            break;
-                    }
+                String[] splittedLine = line.split(",");
+                if (splittedLine.length <= TASK_TYPE_START_FROM) {
+                    continue;
+                }
+                String type = splittedLine[TASK_TYPE_START_FROM];
+                switch (type) {
+                    case "TASK":
+                        Task task = restoredManager.createTaskFromString(line);
+                        currentId = Math.max(currentId, task.getId());
+                        break;
+                    case "EPIC":
+                        Epic epic = restoredManager.createEpicFromString(line);
+                        currentId = Math.max(currentId, epic.getId());
+                        break;
+                    case "SUBTASK":
+                        Subtask subtask = restoredManager.createSubtaskFromString(line);
+                        restoredManager.epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
+                        currentId = Math.max(currentId, subtask.getId());
+                        break;
                 }
             }
 
-            if (!lines.get(lines.size() - 1).contains("TASK") && !lines.get(lines.size() - 1).contains("EPIC") && !lines.get(lines.size() - 1).contains("SUBTASK")) {
+            if (theLastLineIsHistory(lines)) {
                 List<Integer> restoredHistory = historyFromString(lines.get(lines.size() - 1));
                 for (Integer id : restoredHistory) {
                     if (restoredManager.tasks.get(id) != null) {
@@ -79,11 +77,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Information not saved" , e);
+            throw new ManagerSaveException("Information not saved", e);
         }
         return restoredManager;
     }
-
 
     @Override
     public Task getTaskById(int taskId) {
@@ -127,36 +124,57 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return currentId;
     }
 
-    private static String historyToString(HistoryManager manager) {
-        StringBuilder historyIds = new StringBuilder();
-        for (Task task : manager.getHistory()) {
-            historyIds.append(task.getId()).append(",");
-        }
-        historyIds.deleteCharAt(historyIds.length() - 1);
-        return historyIds.toString();
+    private static boolean theLastLineIsHistory(List<String> lines) {
+        return !lines.get(lines.size() - 1).contains("TASK") && !lines.get(lines.size() - 1).contains("EPIC") && !lines.get(lines.size() - 1).contains("SUBTASK");
+    }
+
+    private static String historyToString(List<Task> history) {
+        return history.stream()
+                .map(Task::getId)
+                .map(Object::toString)
+                .collect(Collectors.joining(","));
     }
 
     private void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(FIRST_CSV_LINE);
-            for (Task task : getAllTasks()) {
+            Stream<Task> combinedStream = Stream.of(getAllTasks(), getAllEpics(), getAllSubtasks())
+                    .flatMap(List::stream);
+            List<Task> collectionCombined = combinedStream.collect(Collectors.toList());
+            for (Task task : collectionCombined) {
                 fileWriter.write(task.toCsvRow() + System.lineSeparator());
-            }
-            for (Epic epic : getAllEpics()) {
-                fileWriter.write(epic.toCsvRow() + System.lineSeparator());
-            }
-            for (Subtask subtask : getAllSubtasks()) {
-                fileWriter.write(subtask.toCsvRow() + System.lineSeparator());
             }
             if (!historyManager.getHistory().isEmpty()) {
                 fileWriter.write("\n");
-                fileWriter.write(historyToString(historyManager));
+                fileWriter.write(historyToString(historyManager.getHistory()));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Information not saved", e);
         }
     }
 
+//    private void savee() {                                                                        Надеюсь я правильно понял что надо было сделать так как я сделал выше, а не так как тут? Сама идея подсказывает заменить forEach стрима на обычный.
+//        try (FileWriter fileWriter = new FileWriter(file)) {                                          На всякий случай оставлю и такой вариант, что бы узнать как все таки правильнее было сделать.
+//            fileWriter.write(FIRST_CSV_LINE);                                                          Так же не понял почему в этом варианте просит сделать try/catch на метод write
+//            Stream<Task> combinedStream = Stream.of(getAllTasks(), getAllEpics(), getAllSubtasks())
+//                    .flatMap(List::stream);
+//            List<Task> collectionCombined = combinedStream.collect(Collectors.toList());
+//            collectionCombined.stream()
+//                    .forEach(task -> {
+//                        try {
+//                            fileWriter.write(task.toCsvRow() + System.lineSeparator());
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    });
+//            if (!historyManager.getHistory().isEmpty()) {
+//                fileWriter.write("\n");
+//                fileWriter.write(historyToString(historyManager.getHistory()));
+//            }
+//        } catch (IOException e) {
+//            throw new ManagerSaveException("Information not saved", e);
+//        }
+//    }
 
     private Task createTaskFromString(String value) {
         String[] taskValue = value.split(",");
@@ -216,90 +234,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static List<Integer> historyFromString(String value) {
         List<Integer> historyIds = new ArrayList<>();
         String[] historyIdsArray = value.split(",");
-        for (String id : historyIdsArray) {
-            historyIds.add(Integer.valueOf(id));
-        }
+        Arrays.stream(historyIdsArray)
+                .map(Integer::parseInt)
+                .forEach(historyIds::add);
         return historyIds;
-    }
-
-
-    public static void main(String[] args) {
-
-        FileBackedTaskManager backedManager = new FileBackedTaskManager(new File("resources/tasks.csv"));
-
-        Task task1 = new Task();
-        task1.setTitle("Task#1");
-        task1.setDescription("Task1 description");
-        task1.setStatus(Status.NEW);
-        task1.setStartTime(LocalDateTime.now());
-        task1.setDuration(10);
-        final int taskId1 = backedManager.createTask(task1);
-
-        Task task2 = new Task();
-        task2.setTitle("Task#2");
-        task2.setDescription("Task2 description");
-        task2.setStatus(Status.IN_PROGRESS);
-        task2.setStartTime(task1.getEndTime().plusMinutes(1));
-        task2.setDuration(15);
-        backedManager.createTask(task2);
-
-        Epic epic1 = new Epic();
-        epic1.setTitle("Epic#1");
-        epic1.setDescription("Epic1 description");
-        final int epicId1 = backedManager.createEpic(epic1);
-
-        Subtask subtask1 = new Subtask();
-        subtask1.setTitle("Subtask#1-1");
-        subtask1.setDescription("Subtask1-1 description");
-        subtask1.setStatus(Status.NEW);
-        subtask1.setEpicId(epicId1);
-        subtask1.setStartTime(task2.getEndTime().plusMinutes(1));
-        subtask1.setDuration(20);
-        backedManager.createSubtask(subtask1);
-
-        Subtask subtask2 = new Subtask();
-        subtask2.setTitle("Subtask#2-1");
-        subtask2.setDescription("Subtask2-1 description");
-        subtask2.setStatus(Status.IN_PROGRESS);
-        subtask2.setEpicId(epicId1);
-        subtask2.setStartTime(subtask1.getEndTime().plusMinutes(1));
-        subtask2.setDuration(10);
-        backedManager.createSubtask(subtask2);
-
-        Subtask subtask3 = new Subtask();
-        subtask3.setTitle("Subtask#3-1");
-        subtask3.setDescription("Subtask3-1 description");
-        subtask3.setStatus(Status.DONE);
-        subtask3.setEpicId(epicId1);
-        subtask3.setStartTime(subtask2.getEndTime().plusMinutes(1));
-        subtask3.setDuration(30);
-        final int subtaskId3 = backedManager.createSubtask(subtask3);
-
-        Task task6 = new Task();
-        task6.setTitle("Task#6");
-        task6.setDescription("Task6 description");
-        task6.setStatus(Status.NEW);
-        backedManager.createTask(task6);
-
-        Epic epic2 = new Epic();
-        epic2.setTitle("Epic#2");
-        epic2.setDescription("Epic2 description");
-        backedManager.createEpic(epic2);
-
-        Subtask subtask6 = new Subtask();
-        subtask6.setTitle("Subtask#6-1");
-        subtask6.setDescription("Subtask6-1 description");
-        subtask6.setStatus(Status.IN_PROGRESS);
-        subtask6.setEpicId(epicId1);
-        backedManager.createSubtask(subtask6);
-
-        backedManager.getTaskById(taskId1);
-        backedManager.getEpicById(epicId1);
-        backedManager.getSubtaskById(subtaskId3);
-
-
-        FileBackedTaskManager restoredManager = loadFromFile(new File("resources/tasks.csv"));    //// Так как появились тесты - main тут и из корня проекта удалять?
-
-        System.out.println(restoredManager.getPrioritizedTasks());
     }
 }

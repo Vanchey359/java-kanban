@@ -1,10 +1,7 @@
-package ru.yandex.practicum.tasktracker.service.test;
+package ru.yandex.practicum.tasktracker.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.tasktracker.service.InMemoryTaskManager;
-import ru.yandex.practicum.tasktracker.service.TaskManager;
-import ru.yandex.practicum.tasktracker.service.TimeCrossingException;
 import ru.yandex.practicum.tasktracker.task.Epic;
 import ru.yandex.practicum.tasktracker.task.Status;
 import ru.yandex.practicum.tasktracker.task.Subtask;
@@ -14,10 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// идея сама wildcard import делает после почти любых моих манипуляций с методами, где нужны эти импорты
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class InMemoryTaskManagerTest {

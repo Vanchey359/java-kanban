@@ -1,8 +1,6 @@
-package ru.yandex.practicum.tasktracker.service.test;
+package ru.yandex.practicum.tasktracker.service;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.tasktracker.service.HistoryManager;
-import ru.yandex.practicum.tasktracker.service.InMemoryHistoryManager;
 import ru.yandex.practicum.tasktracker.task.Task;
 
 import java.util.List;

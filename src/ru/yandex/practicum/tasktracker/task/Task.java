@@ -103,21 +103,22 @@ public class Task implements Comparable<Task> {
     }
 
     public String toCsvRow() {
-        return getId() + "," + TaskType.TASK + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
+        return getId() + "," + TaskType.TASK + "," + getTitle() + ","
+                + getStatus() + "," + getDescription() + "," + getStartTime() + ","
+                + getDuration() + "," + getEndTime();
     }
 
     @Override
     public int compareTo(Task o) {
-
-        if (this.startTime == null) {
+        if (startTime == null && o.getStartTime() != null) {
             return 1;
         }
-        if (o.getStartTime() == null) {
+        if (startTime != null && o.getStartTime() == null) {
             return -1;
         }
-        if (this.startTime.isAfter(o.getStartTime())) {
-            return 1;
+        if (startTime == null && o.getStartTime() == null) {
+            return id.compareTo(o.getId());
         }
-        return -1;
+        return startTime.compareTo(o.getStartTime());
     }
 }

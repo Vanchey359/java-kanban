@@ -57,6 +57,8 @@ public class Epic extends Task {
 
     @Override
     public String toCsvRow() {
-        return getId() + "," + TaskType.EPIC + "," + getTitle() + "," + getStatus() + "," + getDescription() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
+        return getId() + "," + TaskType.EPIC + "," + getTitle() + ","
+                + getStatus() + "," + getDescription() + "," + getStartTime() + ","
+                + getDuration() + "," + getEndTime();
     }
 }

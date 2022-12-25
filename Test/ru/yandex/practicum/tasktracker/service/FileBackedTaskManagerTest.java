@@ -1,8 +1,6 @@
-package ru.yandex.practicum.tasktracker.service.test;
+package ru.yandex.practicum.tasktracker.service;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.tasktracker.service.FileBackedTaskManager;
-import ru.yandex.practicum.tasktracker.service.ManagerSaveException;
 import ru.yandex.practicum.tasktracker.task.Epic;
 import ru.yandex.practicum.tasktracker.task.Status;
 import ru.yandex.practicum.tasktracker.task.Subtask;
@@ -15,13 +13,11 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.practicum.tasktracker.service.FileBackedTaskManager.loadFromFile;
 
 
-public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest{
+public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
 
     private FileBackedTaskManager fileBackedTaskManager;
 
