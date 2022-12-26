@@ -1,7 +1,5 @@
 package ru.yandex.practicum.tasktracker.task;
 
-import ru.yandex.practicum.tasktracker.service.TaskType;
-
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -35,7 +33,8 @@ public class Subtask extends Task {
     @Override
     public String toCsvRow() {
         return getId() + "," + TaskType.SUBTASK + "," + getTitle() + ","
-                + getStatus() + "," + getDescription() + "," + getEpicId() + ","
-                + getStartTime() + "," + getDuration() + "," + getEndTime();
+                + getStatus() + "," + getDescription() + ","
+                + getEpicId() + "," + getStartTime() + ","
+                + getDuration() + "," + getEndTime();
     }
 }

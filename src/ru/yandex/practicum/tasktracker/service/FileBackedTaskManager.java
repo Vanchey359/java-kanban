@@ -10,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final int DURATION = 6;
     private static final int END_TIME = 7;
     public static final int TASK_TYPE_START_FROM = 1;
-    public static final String FIRST_CSV_LINE = "id,type,name,status,description,epic,startTime,duration,endTime" + System.lineSeparator();
+    public static final String FIRST_CSV_LINE = "id,type,name,status,description,epic,startTime,duration,endTime" + "\n";
 
     private final File file;
 
@@ -42,11 +41,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             List<String> lines = Files.readAllLines(file.toPath());
             for (String line : lines) {
-                String[] splittedLine = line.split(",");
-                if (splittedLine.length <= TASK_TYPE_START_FROM) {
+                String[] values = line.split(",");
+                if (values.length <= TASK_TYPE_START_FROM) {
                     continue;
                 }
-                String type = splittedLine[TASK_TYPE_START_FROM];
+                String type = values[TASK_TYPE_START_FROM];
                 switch (type) {
                     case "TASK":
                         Task task = restoredManager.createTaskFromString(line);
@@ -63,8 +62,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         break;
                 }
             }
-
-            if (theLastLineIsHistory(lines)) {
+            if (lines.isEmpty()) {
+                return restoredManager;
+            }
+            if (isHistoryLine(lines)) {
                 List<Integer> restoredHistory = historyFromString(lines.get(lines.size() - 1));
                 for (Integer id : restoredHistory) {
                     if (restoredManager.tasks.get(id) != null) {
@@ -124,8 +125,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return currentId;
     }
 
-    private static boolean theLastLineIsHistory(List<String> lines) {
-        return !lines.get(lines.size() - 1).contains("TASK") && !lines.get(lines.size() - 1).contains("EPIC") && !lines.get(lines.size() - 1).contains("SUBTASK");
+    private static boolean isHistoryLine(List<String> lines) {
+        return !lines.get(lines.size() - 1).contains("TASK")
+                && !lines.get(lines.size() - 1).contains("EPIC")
+                && !lines.get(lines.size() - 1).contains("SUBTASK");
     }
 
     private static String historyToString(List<Task> history) {
@@ -138,12 +141,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(FIRST_CSV_LINE);
-            Stream<Task> combinedStream = Stream.of(getAllTasks(), getAllEpics(), getAllSubtasks())
-                    .flatMap(List::stream);
-            List<Task> collectionCombined = combinedStream.collect(Collectors.toList());
-            for (Task task : collectionCombined) {
-                fileWriter.write(task.toCsvRow() + System.lineSeparator());
-            }
+            String taskLines = Stream.of(getAllTasks(), getAllEpics(), getAllSubtasks())
+                    .flatMap(List::stream)
+                    .map(Task::toCsvRow)
+                    .collect(Collectors.joining("\n"));
+            fileWriter.write(taskLines + "\n");
             if (!historyManager.getHistory().isEmpty()) {
                 fileWriter.write("\n");
                 fileWriter.write(historyToString(historyManager.getHistory()));
@@ -152,29 +154,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerSaveException("Information not saved", e);
         }
     }
-
-//    private void savee() {                                                                        Надеюсь я правильно понял что надо было сделать так как я сделал выше, а не так как тут? Сама идея подсказывает заменить forEach стрима на обычный.
-//        try (FileWriter fileWriter = new FileWriter(file)) {                                          На всякий случай оставлю и такой вариант, что бы узнать как все таки правильнее было сделать.
-//            fileWriter.write(FIRST_CSV_LINE);                                                          Так же не понял почему в этом варианте просит сделать try/catch на метод write
-//            Stream<Task> combinedStream = Stream.of(getAllTasks(), getAllEpics(), getAllSubtasks())
-//                    .flatMap(List::stream);
-//            List<Task> collectionCombined = combinedStream.collect(Collectors.toList());
-//            collectionCombined.stream()
-//                    .forEach(task -> {
-//                        try {
-//                            fileWriter.write(task.toCsvRow() + System.lineSeparator());
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    });
-//            if (!historyManager.getHistory().isEmpty()) {
-//                fileWriter.write("\n");
-//                fileWriter.write(historyToString(historyManager.getHistory()));
-//            }
-//        } catch (IOException e) {
-//            throw new ManagerSaveException("Information not saved", e);
-//        }
-//    }
 
     private Task createTaskFromString(String value) {
         String[] taskValue = value.split(",");
@@ -232,11 +211,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static List<Integer> historyFromString(String value) {
-        List<Integer> historyIds = new ArrayList<>();
         String[] historyIdsArray = value.split(",");
-        Arrays.stream(historyIdsArray)
+        return Arrays.stream(historyIdsArray)
                 .map(Integer::parseInt)
-                .forEach(historyIds::add);
-        return historyIds;
+                .collect(Collectors.toList());
     }
 }

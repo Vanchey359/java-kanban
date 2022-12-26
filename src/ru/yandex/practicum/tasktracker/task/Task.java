@@ -1,7 +1,5 @@
 package ru.yandex.practicum.tasktracker.task;
 
-import ru.yandex.practicum.tasktracker.service.TaskType;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -103,21 +101,19 @@ public class Task implements Comparable<Task> {
     }
 
     public String toCsvRow() {
-        return getId() + "," + TaskType.TASK + "," + getTitle() + ","
-                + getStatus() + "," + getDescription() + "," + getStartTime() + ","
+        return getId() + "," + TaskType.TASK + ","
+                + getTitle() + "," + getStatus() + ","
+                + getDescription() + "," + getStartTime() + ","
                 + getDuration() + "," + getEndTime();
     }
 
     @Override
     public int compareTo(Task o) {
-        if (startTime == null && o.getStartTime() != null) {
+        if (startTime == null) {
             return 1;
         }
-        if (startTime != null && o.getStartTime() == null) {
+        if (o.startTime == null) {
             return -1;
-        }
-        if (startTime == null && o.getStartTime() == null) {
-            return id.compareTo(o.getId());
         }
         return startTime.compareTo(o.getStartTime());
     }

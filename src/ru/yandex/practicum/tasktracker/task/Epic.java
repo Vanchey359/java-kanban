@@ -1,7 +1,5 @@
 package ru.yandex.practicum.tasktracker.task;
 
-import ru.yandex.practicum.tasktracker.service.TaskType;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +56,8 @@ public class Epic extends Task {
     @Override
     public String toCsvRow() {
         return getId() + "," + TaskType.EPIC + "," + getTitle() + ","
-                + getStatus() + "," + getDescription() + "," + getStartTime() + ","
-                + getDuration() + "," + getEndTime();
+                + getStatus() + "," + getDescription() + ","
+                + getStartTime() + "," + getDuration() + ","
+                + getEndTime();
     }
 }

@@ -11,13 +11,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class InMemoryTaskManagerTest {
 
     private TaskManager taskManager;
-
 
     @BeforeEach
     void setUp() {
@@ -544,7 +545,7 @@ class InMemoryTaskManagerTest {
         taskManager.createSubtask(subtask1);
 
         List<Task> sortedTasks = new ArrayList<>(taskManager.getPrioritizedTasks());
-        
+
         Task actual = sortedTasks.get(3);
 
         assertEquals(task2, actual, "Task without start time was not moved to the end");

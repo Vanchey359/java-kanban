@@ -7,7 +7,11 @@ import ru.yandex.practicum.tasktracker.task.Task;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -38,20 +42,20 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllTasks() {
-        for (Task task : tasks.values()) {
-            historyManager.remove(task.getId());
+        for (int taskId : tasks.keySet()) {
+            historyManager.remove(taskId);
         }
         tasks.clear();
     }
 
     @Override
     public void removeAllEpics() {
-        for (Epic epic : epics.values()) {
-            List<Subtask> epicSubtasks = getSubtasksByEpic(epic.getId());
+        for (int epicId : epics.keySet()) {
+            List<Subtask> epicSubtasks = getSubtasksByEpic(epicId);
             for (Subtask subtask : epicSubtasks) {
                 historyManager.remove(subtask.getId());
             }
-            historyManager.remove(epic.getId());
+            historyManager.remove(epicId);
         }
         epics.clear();
         subtasks.clear();
@@ -59,8 +63,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllSubtasks() {
-        for (Subtask subtask : subtasks.values()) {
-            historyManager.remove(subtask.getId());
+        for (int subtaskId : subtasks.keySet()) {
+            historyManager.remove(subtaskId);
         }
         subtasks.clear();
         for (Epic epic : epics.values()) {
