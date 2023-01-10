@@ -1,9 +1,7 @@
-package ru.yandex.practicum.tasktracker;
-
+package ru.yandex.practicum.tasktracker.service;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.tasktracker.servers.KVServer;
-import ru.yandex.practicum.tasktracker.service.HttpTasksManager;
-import ru.yandex.practicum.tasktracker.service.Managers;
-import ru.yandex.practicum.tasktracker.service.TaskManager;
 import ru.yandex.practicum.tasktracker.task.Epic;
 import ru.yandex.practicum.tasktracker.task.Status;
 import ru.yandex.practicum.tasktracker.task.Subtask;
@@ -12,10 +10,10 @@ import ru.yandex.practicum.tasktracker.task.Task;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class Main {
+public class HttpTasksManagerTest extends FileBackedTaskManagerTest{
 
-    public static void main(String[] args) throws IOException {
-
+    @Test
+    void shoulLoadManagerFromServer() throws IOException {
         new KVServer().start();
 
         TaskManager httpManager = Managers.getDefaultManager();
@@ -58,9 +56,9 @@ public class Main {
 
         HttpTasksManager refreshedHttpManager = new HttpTasksManager();
         refreshedHttpManager.load();
-        System.out.println(refreshedHttpManager.getPrioritizedTasks());
-        System.out.println(refreshedHttpManager.getAllTasks());
-        System.out.println(refreshedHttpManager.getAllSubtasks());
-        System.out.println(refreshedHttpManager.getAllEpics());
+
+        Assertions.assertEquals(httpManager.getAllTasks(), refreshedHttpManager.getAllTasks());
+        Assertions.assertEquals(httpManager.getAllSubtasks(), refreshedHttpManager.getAllSubtasks());
+        Assertions.assertEquals(httpManager.getAllEpics(), refreshedHttpManager.getAllEpics());
     }
 }

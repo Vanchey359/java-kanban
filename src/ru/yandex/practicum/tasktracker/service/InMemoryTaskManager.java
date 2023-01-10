@@ -24,6 +24,17 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Epic> epics = new HashMap<>();
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
 
+    public Map<Integer, Task> getTasksMap() {
+        return tasks;
+    }
+
+    public Map<Integer, Epic> getEpicsMap() {
+        return epics;
+    }
+
+    public Map<Integer, Subtask> getSubtasksMap() {
+        return subtasks;
+    }
 
     @Override
     public List<Task> getAllTasks() {
@@ -42,9 +53,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllTasks() {
-        for (int taskId : tasks.keySet()) {
-            historyManager.remove(taskId);
-        }
+        tasks.keySet()
+                .forEach(historyManager::remove);
         tasks.clear();
     }
 
@@ -173,8 +183,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Subtask> getSubtasksByEpic(int epicId) {
-        List<Subtask> allSubtasks = new ArrayList<>(subtasks.values());
-        return allSubtasks.stream()
+        return subtasks.values().stream()
                 .filter(subtask -> subtask.getEpicId() == epicId)
                 .collect(Collectors.toList());
     }

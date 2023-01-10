@@ -26,12 +26,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static final int DURATION = 6;
     private static final int END_TIME = 7;
     public static final int TASK_TYPE_START_FROM = 1;
-    public static final String FIRST_CSV_LINE = "id,type,name,status,description,epic,startTime,duration,endTime" + "\n";
+    public static final String CSV_HEADER = "id,type,name,status,description,epic,startTime,duration,endTime" + "\n";
 
-    private final File file;
+    private File file;
 
-    public FileBackedTaskManager(File file) {
+    protected FileBackedTaskManager(File file) {
         this.file = file;
+    }
+
+    protected FileBackedTaskManager() {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
@@ -40,6 +43,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try {
             List<String> lines = Files.readAllLines(file.toPath());
+            if (lines.isEmpty()) {
+                return restoredManager;
+            }
             for (String line : lines) {
                 String[] values = line.split(",");
                 if (values.length <= TASK_TYPE_START_FROM) {
@@ -61,9 +67,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         currentId = Math.max(currentId, subtask.getId());
                         break;
                 }
-            }
-            if (lines.isEmpty()) {
-                return restoredManager;
             }
             if (isHistoryLine(lines)) {
                 List<Integer> restoredHistory = historyFromString(lines.get(lines.size() - 1));
@@ -138,9 +141,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 .collect(Collectors.joining(","));
     }
 
-    private void save() {
+    protected void save() {
         try (FileWriter fileWriter = new FileWriter(file)) {
-            fileWriter.write(FIRST_CSV_LINE);
+            fileWriter.write(CSV_HEADER);
             String taskLines = Stream.of(getAllTasks(), getAllEpics(), getAllSubtasks())
                     .flatMap(List::stream)
                     .map(Task::toCsvRow)

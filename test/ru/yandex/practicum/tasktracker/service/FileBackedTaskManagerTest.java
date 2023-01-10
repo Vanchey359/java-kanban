@@ -1,33 +1,31 @@
 package ru.yandex.practicum.tasktracker.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.tasktracker.task.Epic;
 import ru.yandex.practicum.tasktracker.task.Status;
 import ru.yandex.practicum.tasktracker.task.Subtask;
 import ru.yandex.practicum.tasktracker.task.Task;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
+class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
 
     @Override
     protected FileBackedTaskManager createTaskManager() {
-        try (BufferedWriter bf = Files.newBufferedWriter(Path.of("resources/restored-manager-tests.csv"),
-                StandardOpenOption.TRUNCATE_EXISTING)) {
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return FileBackedTaskManager.loadFromFile(new File("resources/restored-manager-tests.csv"));
+    }
+
+    @AfterEach
+    void cleanData() throws IOException {
+        Files.write(Path.of("resources/restored-manager-tests.csv"), new byte[]{});
     }
 
     @Test
@@ -62,7 +60,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
                 ",EPIC,Epic#1,IN_PROGRESS,Epic1 description," + epic1.getStartTime() +
                 "," + epic1.getDuration() + "," + epic1.getEndTime() + "\n" + subtask1.getId() +
                 ",SUBTASK,Subtask#1-1,IN_PROGRESS,Subtask1-1 description," + subtask1.getEpicId() +
-                "," + subtask1.getStartTime() + "," + subtask1.getDuration() + "," + subtask1.getEndTime() + "\n"; // Делаю так, а не читаю строку из файла, потому что startTime и endTime будут меняться при каждом вызове. Можно убрать дату из тасков и сделать через файл или оставить так?
+                "," + subtask1.getStartTime() + "," + subtask1.getDuration() + "," + subtask1.getEndTime() + "\n";
 
         String actual = Files.readString(Path.of("resources/restored-manager-test-save.csv"));
 
@@ -72,7 +70,6 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
     @Test
     void loadFromFile_shouldLoadSavedTaskSubtasksAndEpicFromFile() {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new File("resources/restored-manager-test-load.csv"));
-
         Task task1 = new Task();
         task1.setTitle("Task#1");
         task1.setDescription("Task1 description");
@@ -97,17 +94,19 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
 
         FileBackedTaskManager restoredManager = FileBackedTaskManager.loadFromFile(new File("resources/restored-manager-test-load.csv"));
 
-        List<Task> expected = new ArrayList<>();
-        expected.addAll(fileBackedTaskManager.getAllTasks());
-        expected.addAll(fileBackedTaskManager.getAllSubtasks());
-        expected.addAll(fileBackedTaskManager.getAllEpics());
+        List<Task> expected1 = List.of(task1);
+        List<Task> actual1 = restoredManager.getAllTasks();
 
-        List<Task> actual = new ArrayList<>();
-        actual.addAll(restoredManager.getAllTasks());
-        actual.addAll(restoredManager.getAllSubtasks());
-        actual.addAll(restoredManager.getAllEpics());
+        assertEquals(expected1, actual1, "Tasks not loaded from file");
 
-        assertEquals(expected, actual, "Tasks not loaded from file");
+        List<Subtask> expected2 = List.of(subtask1);
+        List<Subtask> actual2 = restoredManager.getAllSubtasks();
 
+        assertEquals(expected2, actual2, "Subtasks not loaded from file");
+
+        List<Epic> expected3 = List.of(epic1);
+        List<Epic> actual3 = restoredManager.getAllEpics();
+
+        assertEquals(expected3, actual3, "Epics not loaded from file");
     }
 }

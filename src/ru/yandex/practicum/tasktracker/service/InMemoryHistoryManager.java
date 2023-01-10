@@ -33,26 +33,27 @@ public class InMemoryHistoryManager implements HistoryManager{
     @Override
     public void remove(int taskId) {
         final Node node = nodes.get(taskId);
-        if (node != null) {
-            final Node next = node.next;
-            final Node prev = node.prev;
-
-            if (prev == null) {
-                first = next;
-            } else {
-                prev.next = next;
-                node.prev = null;
-            }
-
-            if (next == null) {
-                last = prev;
-            } else {
-                next.prev = prev;
-                node.next = null;
-            }
-
-            node.task = null;
+        if (node == null) {
+            return;
         }
+        final Node next = node.next;
+        final Node prev = node.prev;
+
+        if (prev == null) {
+            first = next;
+        } else {
+            prev.next = next;
+            node.prev = null;
+        }
+
+        if (next == null) {
+            last = prev;
+        } else {
+            next.prev = prev;
+            node.next = null;
+        }
+
+        node.task = null;
     }
 
     private Node linkLast(Task task) {
