@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 
 public class Managers {
 
+    private static TaskManager taskManager;
+
     public static TaskManager getDefault() {
         return new FileBackedTaskManager(new File("resources/restored-manager.csv"));
     }

@@ -1,7 +1,7 @@
 package ru.yandex.practicum.tasktracker.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.tasktracker.servers.KVServer;
+import ru.yandex.practicum.tasktracker.server.KVServer;
 import ru.yandex.practicum.tasktracker.task.Epic;
 import ru.yandex.practicum.tasktracker.task.Status;
 import ru.yandex.practicum.tasktracker.task.Subtask;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class HttpTasksManagerTest extends FileBackedTaskManagerTest{
 
     @Test
-    void shoulLoadManagerFromServer() throws IOException {
+    void shouldLoadManagerFromServer() throws IOException {
         new KVServer().start();
 
         TaskManager httpManager = Managers.getDefaultManager();

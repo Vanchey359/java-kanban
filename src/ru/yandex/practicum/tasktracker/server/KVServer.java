@@ -1,4 +1,4 @@
-package ru.yandex.practicum.tasktracker.servers;
+package ru.yandex.practicum.tasktracker.server;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -31,28 +31,28 @@ public class KVServer {
         try {
             System.out.println("\n/load");
             if (!hasAuth(h)) {
-                System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+                System.out.println("Request not authorized, need parameter in query API_TOKEN with api-key value");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
             if ("GET".equals(h.getRequestMethod())) {
                 String key = h.getRequestURI().getPath().substring("/load/".length());
                 if (key.isEmpty()) {
-                    System.out.println("Key для загрузки пустой. Key указывается в пути: /load/{key}");
+                    System.out.println("Key to download is empty. Key is specified in the path: /load/{key}");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
                 String value = data.get(key);
                 if (value.isEmpty()) {
-                    System.out.println("Value для загрузки пустое. Value указывается в теле запроса");
+                    System.out.println("Value to load is empty. Value is specified in the request body");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
                 sendText(h, value);
-                System.out.println("Значение для ключа " + key + " успешно обновлено!");
+                System.out.println("Key value " + key + " successfully updated!");
                 h.sendResponseHeaders(200, 0);
             } else {
-                System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
+                System.out.println("/load waiting GET-request, but received: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -64,28 +64,28 @@ public class KVServer {
         try {
             System.out.println("\n/save");
             if (!hasAuth(h)) {
-                System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+                System.out.println("Request not authorized, need parameter in query API_TOKEN with api-key value");
                 h.sendResponseHeaders(403, 0);
                 return;
             }
             if ("POST".equals(h.getRequestMethod())) {
                 String key = h.getRequestURI().getPath().substring("/save/".length());
                 if (key.isEmpty()) {
-                    System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
+                    System.out.println("Key to save empty. key is specified in the path: /save/{key}");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
                 String value = readText(h);
                 if (value.isEmpty()) {
-                    System.out.println("Value для сохранения пустой. value указывается в теле запроса");
+                    System.out.println("Value to save empty. value is specified in the request body");
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
                 data.put(key, value);
-                System.out.println("Значение для ключа " + key + " успешно обновлено!");
+                System.out.println("Key value " + key + " successfully updated!");
                 h.sendResponseHeaders(200, 0);
             } else {
-                System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());
+                System.out.println("/save is waiting for a POST request, and received: " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -99,7 +99,7 @@ public class KVServer {
             if ("GET".equals(h.getRequestMethod())) {
                 sendText(h, apiToken);
             } else {
-                System.out.println("/register ждёт GET-запрос, а получил " + h.getRequestMethod());
+                System.out.println("/register is waiting for a GET request, but received " + h.getRequestMethod());
                 h.sendResponseHeaders(405, 0);
             }
         } finally {
@@ -108,14 +108,14 @@ public class KVServer {
     }
 
     public void start() {
-        System.out.println("Запускаем сервер на порту " + PORT);
-        System.out.println("Открой в браузере http://localhost:" + PORT + "/");
+        System.out.println("Starting the server on a port " + PORT);
+        System.out.println("Open in browser http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + apiToken);
         server.start();
     }
 
     public void stop() {
-        System.out.println("Сервер остановлен");
+        System.out.println("Server stopped");
         server.stop(0);
     }
 

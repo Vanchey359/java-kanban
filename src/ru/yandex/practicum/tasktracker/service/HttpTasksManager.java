@@ -2,7 +2,7 @@ package ru.yandex.practicum.tasktracker.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import ru.yandex.practicum.tasktracker.clients.KVTaskClient;
+import ru.yandex.practicum.tasktracker.client.KVTaskClient;
 import ru.yandex.practicum.tasktracker.task.Epic;
 import ru.yandex.practicum.tasktracker.task.Subtask;
 import ru.yandex.practicum.tasktracker.task.Task;
@@ -26,7 +26,7 @@ public class HttpTasksManager extends FileBackedTaskManager {
     }
 
     @Override
-    public void save() {
+    protected void save() {
         String prioritizedTasks = gson.toJson(getPrioritizedTasks());
         client.save("tasks", prioritizedTasks);
 

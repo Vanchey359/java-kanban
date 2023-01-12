@@ -1,6 +1,6 @@
 package ru.yandex.practicum.tasktracker;
 
-import ru.yandex.practicum.tasktracker.servers.KVServer;
+import ru.yandex.practicum.tasktracker.server.KVServer;
 import ru.yandex.practicum.tasktracker.service.HttpTasksManager;
 import ru.yandex.practicum.tasktracker.service.Managers;
 import ru.yandex.practicum.tasktracker.service.TaskManager;

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.tasktracker.servers;
+package ru.yandex.practicum.tasktracker.server;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
